@@ -19,7 +19,7 @@ class StringConst {
   // Welcome & Onboarding
   static const String welcome = 'Welcome!';
   static const String getStarted = 'Get Started';
-  static const String getStartedSubtitle = 'Create your account to access personalized services.';
+  static const String getStartedSubtitle = 'Create your account to access \npersonalized services.';
 
   // --- Authentication - Sign In ---
   // Updated signInPrompt to signInSubtitle
@@ -30,7 +30,7 @@ class StringConst {
   static const String passwordHint = 'Enter your Password';
   static const String forgotPassword = 'Forgot Password?';
   static const String continueButton = 'Continue';
-  static const String noAccountPrompt = 'Do not have an account? Create one';
+  static const String noAccountPrompt = 'Do not have an account? ';
   static const String createOne = 'Create one';
   static const String existingCustomerPrompt = 'Already a customer? ';
   static const String setUpOnlineProfile = 'Set up online profile';
@@ -65,7 +65,7 @@ class StringConst {
   static const String confirmPasswordLabel = 'Confirm Password';
   static const String confirmPasswordHint = 'Enter your Password';
   static const String termsAgreement = 'I agree to the Terms & Conditions and Privacy Policy';
-  static const String alreadyHaveAccountPrompt = 'Already have an account? Sign in';
+  static const String alreadyHaveAccountPrompt = 'Already have an account? ';
   static const String signIn = 'Sign in';
 
   // --- Verification - Email & Phone ---
@@ -108,6 +108,21 @@ class StringConst {
   static const String customerDetailsNotFoundError = 'Customer details not found.';
   static const String genericFetchError = 'Something went wrong. Please try again.';
 
+  // Add these to your existing StringConst class
+  static const String verifyMail = "Verify Mail";
+  static const String verifyMailSubtitle = "A 6-Digit code has been sent to ";
+  static const String enterCode = ". Enter code.";
+  static const String resendPrompt = "Didn’t receive any code? ";
+  static const String resendLink = "Resend";
+  // Add these to your StringConst class
+  static const String registrationSuccess = "Registration Successful";
+  static const String registrationSuccessSub = "Your email has been successfully verified. Please proceed to verify your phone number.";
+
+  // Add these to your existing StringConst class
+  static const String verifyPhone = "Verify Phone Number";
+  static const String verifyPhoneSubtitle = "A 6-Digit code has been sent to ";
+  static const String phoneRegistrationSuccess = "Verification Complete";
+  static const String phoneRegistrationSuccessSub = "Your phone number has been successfully verified. Let's set up your profile.";
   // --- New: Personal Information Page ---
   static const String personalDetailsAppBarTitle = 'Personal Details';
   static const String personalInfoTitle = 'Personal Information';
