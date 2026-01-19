@@ -43,19 +43,18 @@ abstract class AuthApiClient {
     @Field("refresh_token") required String refreshToken,
   });
 
-  // --- ADMIN API FOR SIGN-UP ---
+  // --- ADMIN API ---
 
-  // Step 1: Check if user exists by email
   @GET(ApiConstants.keycloakGetUsers)
   Future<List<KeycloakUser>> getUsers({
     @Path("realm") required String realm,
-    @Query("email") required String email,
+    @Query("email") String? email,
+    @Query("q") String? q,
+    @Query("first") int? first,
+    @Query("max") int? max,
     @Header("Authorization") required String adminToken,
   });
 
-  // Step 3: Create the user in Keycloak
-  // Note: This returns a 201 Created with an empty body.
-  // We must call getUsers again to get the new user's ID.
   @POST(ApiConstants.keycloakCreateUser)
   Future<void> createUser({
     @Path("realm") required String realm,
@@ -63,7 +62,6 @@ abstract class AuthApiClient {
     @Header("Authorization") required String adminToken,
   });
 
-  // Step 4: Update the user with attributes (requestId, accountType)
   @PUT(ApiConstants.keycloakUpdateUser)
   Future<void> updateUser({
     @Path("realm") required String realm,

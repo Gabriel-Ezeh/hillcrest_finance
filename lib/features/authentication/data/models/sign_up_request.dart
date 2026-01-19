@@ -29,7 +29,9 @@ class SignUpRequest {
   final String firstName;
   final String lastName;
   final bool enabled;
+  final bool emailVerified;
   final List<KeycloakCredential> credentials;
+  final Map<String, String> attributes;
 
   SignUpRequest({
     required this.username,
@@ -37,7 +39,9 @@ class SignUpRequest {
     required this.firstName,
     required this.lastName,
     required this.credentials,
+    required this.attributes,
     this.enabled = true,
+    this.emailVerified = true,
   });
 
   factory SignUpRequest.fromJson(Map<String, dynamic> json) =>

@@ -108,6 +108,21 @@ class AppTextStyles {
     color: AppColors.mutedGray,
   );
 
+  static const TextStyle interRegular10HintGray = TextStyle(
+    fontFamily: _interFont,
+    fontSize: Sizes.TEXT_SIZE_10,
+    fontWeight: FontWeight.w400,
+    color: AppColors.mutedGray,
+  );
+
+  static const TextStyle interRegular10Primary = TextStyle(
+    fontFamily: _interFont,
+    fontSize: Sizes.TEXT_SIZE_10,
+    fontWeight: FontWeight.w400,
+    color: AppColors.primaryColor,
+  );
+
+
   /// Inter Semi-Bold 14px, Dark Blue (REQUIRED: For field labels/titles)
   static const TextStyle interSemiBold14DarkBlue = TextStyle(
     fontFamily: _interFont,

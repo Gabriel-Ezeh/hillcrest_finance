@@ -43,6 +43,22 @@ class EmailVerificationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MainWrapperScreen]
+class MainWrapperRoute extends PageRouteInfo<void> {
+  const MainWrapperRoute({List<PageRouteInfo>? children})
+    : super(MainWrapperRoute.name, initialChildren: children);
+
+  static const String name = 'MainWrapperRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MainWrapperScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [PhoneVerificationScreen]
 class PhoneVerificationRoute extends PageRouteInfo<void> {
   const PhoneVerificationRoute({List<PageRouteInfo>? children})
@@ -54,6 +70,22 @@ class PhoneVerificationRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const PhoneVerificationScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [ProfileScreen]
+class ProfileRoute extends PageRouteInfo<void> {
+  const ProfileRoute({List<PageRouteInfo>? children})
+    : super(ProfileRoute.name, initialChildren: children);
+
+  static const String name = 'ProfileRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ProfileScreen();
     },
   );
 }

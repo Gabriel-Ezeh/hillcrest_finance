@@ -37,6 +37,13 @@ class StringConst {
   static const String login = 'Login';
   // New: Back to Sign In link text
   static const String backToSignIn = 'Back to Sign In';
+  static const String myAccount = 'My Account';
+  static const String logout = 'Logout';
+  static const String profile = 'Profile';
+
+
+
+
 
   // --- Password Reset ---
   static const String passwordResetTitle = 'Password Reset';
@@ -134,4 +141,30 @@ class StringConst {
   static const String kycDocumentUploadTitle = 'KYC Document Upload';
   static const String kycDocumentUploadSubtitle=
       'Upload a valid means of identification to proceed with your account setup.';
+
+  static const String home = 'Home';
+  static const String welcomeUser = 'Welcome,';
+  static const String editProfile = 'Edit Profile';
+  static const String totalBalance = 'Total Balance';
+  static const String send = 'Send';
+  static const String topUp = 'Top Up';
+  static const String viewAll = 'View All';
+  static const String airtime = 'Airtime';
+  static const String data = 'Data';
+  static const String bills = 'Bills';
+  static const String more = 'More';
+  static const String recentTransactions = 'Recent Transactions';
+  static const String quickActions = 'Quick Actions';
+
+  // Add these to your StringConst class (after the existing strings)
+
+// --- Onboarding Completion Modal ---
+  static const String welcomeOnboard = 'Welcome on board!';
+  static const String finishSettingUpProfile = 'Finish setting up your profile.';
+  static const String provideDetailsPrompt = 'Provide the following details to get the most of our services';
+  static const String signUpCompleted = 'Sign up completed';
+  static const String personalInformation = 'Personal information';
+  static const String kycDocumentUpload = 'KYC Document Upload';
+  static const String continueOnboarding = 'Continue Onboarding';
+
 }

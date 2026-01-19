@@ -11,6 +11,10 @@ class ImagePath {
   //Logo Icon
   static const String logoIcon = "$hillCrestDir/hillcrest_logo_icon.png";
 
+  //avater img
+  static const String userPlaceholder = "$imageDir/avater.png";
+
+
   //App Icons
   static const String smsIcon = "$hillCrestDir/sms_icon.png";
   static const String dropdownIcon = "$hillCrestDir/chevron-dropdown_icon_icon_white.png";

@@ -7,6 +7,9 @@ import 'package:hillcrest_finance/features/authentication/presentation/screens/s
 import 'package:hillcrest_finance/features/authentication/presentation/screens/verification_screens/email_verification_screen.dart';
 import 'package:hillcrest_finance/features/authentication/presentation/screens/verification_screens/phone_verification_screen.dart';
 import 'package:hillcrest_finance/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:hillcrest_finance/features/dashboard/presentation/screens/main_wrapper_screen.dart';
+import 'package:hillcrest_finance/features/dashboard/presentation/screens/profile_screen.dart';
+
 
 // This will be generated
 part 'app_router.gr.dart';
@@ -56,9 +59,25 @@ class AppRouter extends RootStackRouter {
     ),
 
     // Dashboard screen
+
+
+    // Main Wrapper with Nested Tabs 🚀
     AutoRoute(
-      page: DashboardRoute.page,
-      path: '/dashboard',
+      page: MainWrapperRoute.page,
+      path: '/main',
+      children: [
+        AutoRoute(
+          page: DashboardRoute.page,
+          path: 'dashboard',
+          initial: true,
+        ),
+        // Placeholder routes for Wallet and Invest can be added here
+        AutoRoute(
+          page: ProfileRoute.page,
+          path: 'profile',
+        ),
+      ],
     ),
+
   ];
 }

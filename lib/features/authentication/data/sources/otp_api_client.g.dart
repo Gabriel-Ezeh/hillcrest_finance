@@ -52,7 +52,7 @@ class _OtpApiClient implements OtpApiClient {
   }
 
   @override
-  Future<void> sendEmail({
+  Future<HttpResponse<String>> sendEmail({
     required String tenantId,
     required SendEmailRequest body,
   }) async {
@@ -66,7 +66,7 @@ class _OtpApiClient implements OtpApiClient {
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
-    final _options = _setStreamType<void>(
+    final _options = _setStreamType<HttpResponse<String>>(
       Options(
             method: 'POST',
             headers: _headers,
@@ -81,14 +81,24 @@ class _OtpApiClient implements OtpApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch<String>(_options);
+    late String _value;
+    try {
+      _value = _result.data!;
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   @override
-  Future<void> sendSmsOtp({
-    required String tenantId,
+  Future<SmsResponse> sendSmsOtp({
     required String message,
     required String phoneNumber,
+    required String tenantId,
+    required String token,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -96,12 +106,12 @@ class _OtpApiClient implements OtpApiClient {
       r'recipient': phoneNumber,
     };
     final _headers = <String, dynamic>{
-      r'Accept': 'application/json',
       r'x-tenant-id': tenantId,
+      r'Authorization': token,
     };
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<void>(
+    final _options = _setStreamType<SmsResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -111,12 +121,21 @@ class _OtpApiClient implements OtpApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SmsResponse _value;
+    try {
+      _value = SmsResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
-  Future<void> validateOtp({
+  Future<HttpResponse<String>> validateOtp({
     required String tenantId,
+    required String authorization,
     required String userId,
     required String otp,
   }) async {
@@ -125,10 +144,11 @@ class _OtpApiClient implements OtpApiClient {
     final _headers = <String, dynamic>{
       r'Accept': 'application/json',
       r'x-tenant-id': tenantId,
+      r'Authorization': authorization,
     };
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<void>(
+    final _options = _setStreamType<HttpResponse<String>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -138,7 +158,16 @@ class _OtpApiClient implements OtpApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch<String>(_options);
+    late String _value;
+    try {
+      _value = _result.data!;
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

@@ -7,6 +7,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:hillcrest_finance/app/core/providers/notification_service_provider.dart';
 import 'package:hillcrest_finance/app/core/providers/networking_provider.dart';
 import 'package:hillcrest_finance/app/core/exceptions/network_exceptions.dart';
+import 'package:hillcrest_finance/app/core/providers/user_local_storage_provider.dart';
 import 'package:hillcrest_finance/ui/widgets/app_button.dart';
 import 'package:hillcrest_finance/utils/constants/values.dart';
 import '../../../../../app/core/router/app_router.dart';
@@ -77,7 +78,7 @@ class _PhoneVerificationScreenState extends ConsumerState<PhoneVerificationScree
     }
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog(String username) {
     if (!mounted) return;
 
     AwesomeDialog(
@@ -92,9 +93,10 @@ class _PhoneVerificationScreenState extends ConsumerState<PhoneVerificationScree
       descTextStyle: AppTextStyles.cabinRegular14MutedGray,
       btnOk: AppButton(
         text: StringConst.continueButton,
-        onPressed: () {
+        onPressed: () async {
           Navigator.of(context, rootNavigator: true).pop();
           if (mounted) {
+            await ref.read(userLocalStorageProvider).saveUsername(username);
             ref.read(signUpDataProvider.notifier).clearSignUpData();
             context.router.replaceAll([const SignInRoute()]);
           }
@@ -126,7 +128,7 @@ class _PhoneVerificationScreenState extends ConsumerState<PhoneVerificationScree
       await ref.read(authRepositoryProvider).createKeycloakUser();
       if (!mounted) return;
 
-      _showSuccessDialog();
+      _showSuccessDialog(signUpData.username);
     } on NetworkException catch (e) {
       if (!mounted) return;
       ref.read(notificationServiceProvider).showError(e.message);

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hillcrest_finance/app/core/network/auth_interceptor.dart';
+import 'package:hillcrest_finance/app/core/providers/user_local_storage_provider.dart';
 import 'package:hillcrest_finance/features/authentication/data/sources/auth_api_client.dart';
 import 'package:hillcrest_finance/features/authentication/data/sources/onboarding_api_client.dart';
 import 'package:hillcrest_finance/features/authentication/data/sources/otp_api_client.dart';
@@ -33,7 +34,7 @@ Dio onboardingDio(Ref ref) {
   final dio = Dio(BaseOptions(
     baseUrl: dotenv.env['ISSL_API_DOMAIN']!,
     headers: {
-      'Accept': '*/*', // MODIFIED: Force the Accept header here for all requests
+      'Accept': '*/*',
     },
   ));
   if (kDebugMode) {
@@ -75,8 +76,8 @@ OtpApiClient otpApiClient(Ref ref) {
 AuthRepository authRepository(Ref ref) {
   return AuthRepository(
     authApiClient: ref.watch(authApiClientProvider),
-    onboardingApiClient: ref.watch(onboardingApiClientProvider),
     otpApiClient: ref.watch(otpApiClientProvider),
+    userLocalStorage: ref.watch(userLocalStorageProvider), // ADDED this required parameter
     secureStorage: ref.watch(secureStorageProvider),
     ref: ref,
   );

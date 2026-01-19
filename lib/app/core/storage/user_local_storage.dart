@@ -1,44 +1,55 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// A service class for managing user-related data in local storage (Hive).
-///
-/// This class encapsulates all the logic for reading and writing user preferences,
-/// providing a clean and testable API for the rest of the application.
 class UserLocalStorage {
   final Box _box;
 
   UserLocalStorage(this._box);
 
-  // --- Storage Keys ---
   static const String _kHasSeenOnboarding = 'hasSeenOnboarding';
   static const String _kLastUsedUsername = 'lastUsedUsername';
 
-  // --- Onboarding Status ---
-
-  /// Checks if the user has completed the onboarding flow.
   bool get hasSeenOnboarding {
     return _box.get(_kHasSeenOnboarding, defaultValue: false) as bool;
   }
 
-  /// Marks the onboarding flow as completed.
   Future<void> markOnboardingAsSeen() async {
     await _box.put(_kHasSeenOnboarding, true);
   }
 
-  // --- Last Used Username ---
-
-  /// Gets the last successfully used username.
   String? get lastUsedUsername {
     return _box.get(_kLastUsedUsername) as String?;
   }
 
-  /// Saves the username after a successful login.
   Future<void> saveUsername(String username) async {
     await _box.put(_kLastUsedUsername, username);
   }
 
-  // --- Future features can be added below ---
-  // Example: Theme Preference
-  // String get themePreference => _box.get('theme', defaultValue: 'system');
-  // Future<void> saveThemePreference(String theme) async => await _box.put('theme', theme);
+  Future<void> saveCredentials(String username, String email) async {
+    await _box.put(_kLastUsedUsername, username);
+    // You might want to save the email as well, for example:
+    // await _box.put('lastUsedEmail', email);
+  }
+
+  Future<void> clearCredentials() async {
+    await _box.delete(_kLastUsedUsername);
+  }
+
+// lib/app/core/providers/user_local_storage_provider.dart
+
+  Future<void> clearTokens() async {
+    final box = await Hive.openBox('authData');
+    await box.delete('accessToken');
+    await box.delete('refreshToken');
+  }
+
+  Future<String?> getRefreshToken() async {
+    return _box.get('refreshToken') as String?;
+  }
+
+  Future<void> saveTokens({required String accessToken, required String refreshToken}) async {
+    await _box.put('accessToken', accessToken);
+    await _box.put('refreshToken', refreshToken);
+  }
+
+
 }

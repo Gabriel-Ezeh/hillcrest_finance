@@ -5,6 +5,7 @@ import 'package:hillcrest_finance/app/core/exceptions/network_exceptions.dart';
 import 'package:hillcrest_finance/app/core/providers/notification_service_provider.dart';
 import 'package:hillcrest_finance/app/core/providers/user_local_storage_provider.dart';
 import 'package:hillcrest_finance/app/core/router/app_router.dart';
+import 'package:hillcrest_finance/features/authentication/presentation/providers/auth_state_notifier.dart';
 import 'package:hillcrest_finance/features/authentication/presentation/providers/auth_state_provider.dart';
 import 'package:hillcrest_finance/ui/widgets/app_button.dart';
 import 'package:hillcrest_finance/ui/widgets/forms/app_textfields.dart';

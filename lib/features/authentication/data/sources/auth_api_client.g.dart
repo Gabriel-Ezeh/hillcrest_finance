@@ -141,11 +141,20 @@ class _AuthApiClient implements AuthApiClient {
   @override
   Future<List<KeycloakUser>> getUsers({
     required String realm,
-    required String email,
+    String? email,
+    String? q,
+    int? first,
+    int? max,
     required String adminToken,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'email': email};
+    final queryParameters = <String, dynamic>{
+      r'email': email,
+      r'q': q,
+      r'first': first,
+      r'max': max,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'Authorization': adminToken};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;

@@ -66,6 +66,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     try {
       await ref.read(authRepositoryProvider).checkIfUserExists(
             email: _emailController.text.trim(),
+            phoneNumber: _phoneController.text.trim(),
           );
 
       final signUpData = SignUpData(
@@ -77,21 +78,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         accountType: _selectedAccountType!,
         phoneNumber: _phoneController.text.trim(),
       );
-      ref.read(signUpDataProvider.notifier).state = signUpData;
+      ref.read(signUpDataProvider.notifier).setSignUpData(signUpData);
 
-      // On success, navigate away. Don't change state here as the widget is being disposed.
       if (mounted) {
         context.router.push(const EmailVerificationRoute());
       }
     } on UserAlreadyExistsException catch (e) {
       ref.read(notificationServiceProvider).showError(e.message);
-      if (mounted) setState(() => _isLoading = false);
-    } on NetworkException catch (e) {
+    } on PhoneNumberAlreadyExistsException catch (e) {
       ref.read(notificationServiceProvider).showError(e.message);
-      if (mounted) setState(() => _isLoading = false);
+    }on NetworkException catch (e) {
+      ref.read(notificationServiceProvider).showError(e.message);
     } catch (e) {
       ref.read(notificationServiceProvider).showError('An unexpected error occurred.');
-      if (mounted) setState(() => _isLoading = false);
+    } finally {
+       if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

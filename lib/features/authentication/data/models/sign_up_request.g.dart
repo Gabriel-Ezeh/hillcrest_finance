@@ -29,7 +29,9 @@ SignUpRequest _$SignUpRequestFromJson(Map<String, dynamic> json) =>
       credentials: (json['credentials'] as List<dynamic>)
           .map((e) => KeycloakCredential.fromJson(e as Map<String, dynamic>))
           .toList(),
+      attributes: Map<String, String>.from(json['attributes'] as Map),
       enabled: json['enabled'] as bool? ?? true,
+      emailVerified: json['emailVerified'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$SignUpRequestToJson(SignUpRequest instance) =>
@@ -39,5 +41,7 @@ Map<String, dynamic> _$SignUpRequestToJson(SignUpRequest instance) =>
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'enabled': instance.enabled,
+      'emailVerified': instance.emailVerified,
       'credentials': instance.credentials,
+      'attributes': instance.attributes,
     };

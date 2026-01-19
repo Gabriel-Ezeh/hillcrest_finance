@@ -42,3 +42,14 @@ class UnexpectedException extends NetworkException {
   UnexpectedException({String? message})
       : super(message ?? 'An unexpected error occurred. Please try again.');
 }
+
+/// Thrown when a user with the given phone number already exists.
+class PhoneNumberAlreadyExistsException extends NetworkException {
+  PhoneNumberAlreadyExistsException()
+      : super('An account with this phone number already exists.');
+}
+
+class EmailAlreadyExistsException extends NetworkException {
+  EmailAlreadyExistsException()
+      : super('An account with this email already exists.');
+}
