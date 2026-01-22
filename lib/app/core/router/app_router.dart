@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:hillcrest_finance/features/authentication/presentation/screens/splash_screen.dart';
 import 'package:hillcrest_finance/features/authentication/presentation/screens/welcome_onboarding_screen.dart';
@@ -9,7 +9,8 @@ import 'package:hillcrest_finance/features/authentication/presentation/screens/v
 import 'package:hillcrest_finance/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:hillcrest_finance/features/dashboard/presentation/screens/main_wrapper_screen.dart';
 import 'package:hillcrest_finance/features/dashboard/presentation/screens/profile_screen.dart';
-
+import 'package:hillcrest_finance/features/kyc/kyc_forms/individual_form/individual_personal_information_screen.dart';
+import 'package:hillcrest_finance/features/kyc/kyc_forms/individual_form/individual_kyc_upload_document_screen.dart';
 
 // This will be generated
 part 'app_router.gr.dart';
@@ -58,7 +59,16 @@ class AppRouter extends RootStackRouter {
       path: '/verify-phone',
     ),
 
-    // Dashboard screen
+    // KYC Routes
+    AutoRoute(
+      page: IndividualPersonalInformationRoute.page,
+      path: '/kyc/personal-info',
+    ),
+
+    AutoRoute(
+      page: IndividualKycDocumentUploadRoute.page,
+      path: '/kyc/upload-documents',
+    ),
 
 
     // Main Wrapper with Nested Tabs 🚀

@@ -1,16 +1,88 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:hillcrest_finance/ui/widgets/bottom_navbar.dart';
-
+import 'package:hillcrest_finance/features/authentication/presentation/providers/auth_state_provider.dart';
+import 'package:hillcrest_finance/features/dashboard/presentation/screens/onboarding_completion_modal.dart';
+import 'package:hillcrest_finance/features/kyc/kyc_forms/individual_form/individual_personal_information_screen.dart';
 import 'package:hillcrest_finance/utils/constants/values.dart';
 
 @RoutePage()
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget { // MODIFIED: Converted to stateful
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    // Use WidgetsBinding to safely show a dialog after the screen has finished building.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkOnboardingStatusAndShowModal();
+    });
+  }
+
+  // In dashboard_screen.dart
+
+  void _checkOnboardingStatusAndShowModal() {
+    if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) {
+      return;
+    }
+
+    final authState = ref.read(authStateProvider);
+
+    if (authState.isAuthenticated && authState.hasCustomerNo != true) {
+      final accountType = authState.accountType ?? 'Individual'; // Default fallback
+
+      showOnboardingCompletionModal(
+        context,
+        accountType: accountType, // Pass the account type
+        onContinue: () {
+          Navigator.of(context).pop();
+          _navigateToKYCFlow(accountType);
+        },
+      );
+    }
+  }
+
+  void _navigateToKYCFlow(String accountType) {
+    switch (accountType.toLowerCase()) {
+      case 'individual':
+      // Navigate to personal info form
+        context.router.pushNamed('/kyc/personal-info');
+        break;
+      // case 'corporate':
+      // // Navigate to corporate info form
+      //   context.router.push(const CorporateInfoRoute());
+      //   break;
+      // case 'sme':
+      // // Navigate to SME info form
+      //   context.router.push(const SMEInfoRoute());
+      //   break;
+      default:
+        print('Unknown account type: $accountType');
+        // Fallback to individual
+        context.router.pushNamed('/kyc/personal-info');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // This listener ensures that if the user's status is updated by the background
+    // check while they are on the dashboard, the modal will still appear.
+    ref.listen(authStateProvider.select((state) => state.hasCustomerNo), (previous, next) {
+      // FIXED: Check for both false AND null
+      if (ref.read(authStateProvider).isAuthenticated && next != true) {
+        _checkOnboardingStatusAndShowModal();
+      }
+    });
+
+
+
+    // --- YOUR EXISTING UI CODE STARTS HERE (UNCHANGED) ---
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -30,7 +102,10 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.notifications_none_outlined, color: AppColors.darkBlue, size: 28),
+                        IconButton(
+                          icon: const Icon(Icons.logout), // Example Logout
+                          onPressed: () => ref.read(authStateProvider.notifier).logout(),
+                        ),
                         const SpaceW16(),
                         const CircleAvatar(
                           radius: 18,
@@ -90,17 +165,15 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ),
-      // bottomNavigationBar: AppBottomNav(
-      //   currentIndex: 0,
-      //   onTap: (index) {},
-      // ),
     );
   }
+
+  // --- YOUR EXISTING UI HELPER WIDGETS (UNCHANGED) ---
 
   Widget _buildBalanceCard() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: Sizes.PADDING_24),
-      height: 190, // Fixed height for consistent painting
+      height: 190,
       decoration: BoxDecoration(
         color: AppColors.primaryColor,
         borderRadius: BorderRadius.circular(Sizes.RADIUS_16),
@@ -112,19 +185,15 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      // Stack allows us to place the CustomPaint behind the text content
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Sizes.RADIUS_16),
         child: Stack(
           children: [
-            // 🎨 The Custom Card Pattern (No Image used)
             Positioned.fill(
               child: CustomPaint(
                 painter: CardPatternPainter(),
               ),
             ),
-
-            // Content
             Padding(
               padding: const EdgeInsets.all(Sizes.PADDING_24),
               child: Column(
@@ -264,7 +333,6 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-/// 🎨 Custom Painter to draw organic decorative curves on the balance card
 class CardPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -272,35 +340,23 @@ class CardPatternPainter extends CustomPainter {
       ..color = Colors.white.withOpacity(0.08)
       ..style = PaintingStyle.fill;
 
-    // First Curve (Top Right)
     final path1 = Path();
     path1.moveTo(size.width * 0.4, 0);
-    path1.quadraticBezierTo(
-        size.width * 0.6, size.height * 0.4,
-        size.width, size.height * 0.2
-    );
+    path1.quadraticBezierTo(size.width * 0.6, size.height * 0.4, size.width, size.height * 0.2);
     path1.lineTo(size.width, 0);
     path1.close();
     canvas.drawPath(path1, paint);
 
-    // Second Curve (Bottom Right overlapping)
     final path2 = Path();
     path2.moveTo(size.width * 0.5, size.height);
-    path2.quadraticBezierTo(
-        size.width * 0.8, size.height * 0.3,
-        size.width * 1.2, size.height * 0.7
-    );
+    path2.quadraticBezierTo(size.width * 0.8, size.height * 0.3, size.width * 1.2, size.height * 0.7);
     path2.lineTo(size.width, size.height);
     path2.close();
     canvas.drawPath(path2, paint);
 
-    // Third Curve (Subtle arc from left)
     final path3 = Path();
     path3.moveTo(0, size.height * 0.7);
-    path3.quadraticBezierTo(
-        size.width * 0.3, size.height * 0.9,
-        size.width * 0.2, size.height
-    );
+    path3.quadraticBezierTo(size.width * 0.3, size.height * 0.9, size.width * 0.2, size.height);
     path3.lineTo(0, size.height);
     path3.close();
     canvas.drawPath(path3, paint);

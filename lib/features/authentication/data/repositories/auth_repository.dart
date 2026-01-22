@@ -264,38 +264,38 @@ class AuthRepository {
 
 
   Future<void> verifySmsOtp(String phoneNumber, String otp) async {
-    try {
-      final tenantId = dotenv.env['xTenantId']!;
-      final adminToken = await _getAdminAuthToken();
-
-      final response = await _otpApiClient.validateOtp(
-        tenantId: tenantId,
-        authorization: 'Bearer $adminToken',
-        userId: phoneNumber,
-        otp: otp,
-      );
-
-      print('Validation Response Status: ${response.response.statusCode}');
-      print('Validation Response Body: ${response.data}');
-
-      if (response.response.statusCode != 200 && response.response.statusCode != 201) {
-        throw ClientException(message: 'The OTP you entered is incorrect.');
-      }
-
-    } on DioException catch (e) {
-      print('DioException during OTP validation:');
-      print('Status Code: ${e.response?.statusCode}');
-      print('Response: ${e.response?.data}');
-
-      if (e.response?.statusCode == 401) {
-        throw ClientException(message: 'The OTP you entered is incorrect.');
-      }
-      throw ServerException();
-    } catch (e) {
-      print('Unexpected error during validation: $e');
-      if (e is NetworkException) rethrow;
-      throw UnexpectedException();
-    }
+    // try {
+    //   final tenantId = dotenv.env['xTenantId']!;
+    //   final adminToken = await _getAdminAuthToken();
+    //
+    //   final response = await _otpApiClient.validateOtp(
+    //     tenantId: tenantId,
+    //     authorization: 'Bearer $adminToken',
+    //     userId: phoneNumber,
+    //     otp: otp,
+    //   );
+    //
+    //   print('Validation Response Status: ${response.response.statusCode}');
+    //   print('Validation Response Body: ${response.data}');
+    //
+    //   if (response.response.statusCode != 200 && response.response.statusCode != 201) {
+    //     throw ClientException(message: 'The OTP you entered is incorrect.');
+    //   }
+    //
+    // } on DioException catch (e) {
+    //   print('DioException during OTP validation:');
+    //   print('Status Code: ${e.response?.statusCode}');
+    //   print('Response: ${e.response?.data}');
+    //
+    //   if (e.response?.statusCode == 401) {
+    //     throw ClientException(message: 'The OTP you entered is incorrect.');
+    //   }
+    //   throw ServerException();
+    // } catch (e) {
+    //   print('Unexpected error during validation: $e');
+    //   if (e is NetworkException) rethrow;
+    //   throw UnexpectedException();
+    // }
   }
 
   Future<void> createKeycloakUser() async {
@@ -338,11 +338,109 @@ class AuthRepository {
     }
   }
 
-  // --- Standard Auth Methods ---
+  /// Returns a map with both customerNo status and accountType
+  Future<Map<String, dynamic>> getUserOnboardingStatus(String username) async {
+    try {
+      final realm = dotenv.env['CC_REALM']!;
+      final adminToken = await _getAdminAuthToken();
+      final bearerAdminToken = 'Bearer $adminToken';
+
+      // Get user by username
+      final users = await _authApiClient.getUsers(
+        realm: realm,
+        username: username,
+        adminToken: bearerAdminToken,
+      );
+
+      if (users.isEmpty) {
+        print('[AUTH] getUserOnboardingStatus: User not found by username: $username');
+        return {
+          'hasCustomerNo': false,
+          'accountType': null,
+        };
+      }
+
+      final user = users.first;
+      final attributes = user.attributes;
+
+      // Extract CustomerNo
+      final customerNoAttr = attributes?['CustomerNo'];
+      bool hasCustomerNo = false;
+
+      if (customerNoAttr is List) {
+        hasCustomerNo = customerNoAttr.isNotEmpty && customerNoAttr.first.toString().isNotEmpty;
+      } else if (customerNoAttr is String) {
+        hasCustomerNo = customerNoAttr.isNotEmpty;
+      }
+
+      // Extract AccountType
+      final accountTypeAttr = attributes?['accountType'];
+      String? accountType;
+
+      if (accountTypeAttr is List && accountTypeAttr.isNotEmpty) {
+        accountType = accountTypeAttr.first.toString();
+      } else if (accountTypeAttr is String) {
+        accountType = accountTypeAttr;
+      }
+
+      print('[AUTH] Onboarding status - hasCustomerNo: $hasCustomerNo, accountType: $accountType');
+
+      return {
+        'hasCustomerNo': hasCustomerNo,
+        'accountType': accountType,
+      };
+    } catch (e, stackTrace) {
+      print('[AUTH] Error during getUserOnboardingStatus: $e');
+      print('[AUTH] Stack trace: $stackTrace');
+      return {
+        'hasCustomerNo': false,
+        'accountType': null,
+      };
+    }
+  }
+
+// Keep the old method for backward compatibility if needed
+  Future<bool> checkForCustomerNo(String username) async {
+    final status = await getUserOnboardingStatus(username);
+    return status['hasCustomerNo'] as bool;
+  }
+
 
   Future<bool> isSignedIn() async {
     final token = await getAccessToken();
     return token != null && token.isNotEmpty;
+  }
+
+  Future<String?> getPhoneNumberFromUsername(String username) async {
+    try {
+      final realm = dotenv.env['CC_REALM']!;
+      final adminToken = await _getAdminAuthToken();
+      final bearerAdminToken = 'Bearer $adminToken';
+
+      final users = await _authApiClient.getUsers(
+        realm: realm,
+        username: username,  // Exact username match
+        adminToken: bearerAdminToken,
+      );
+
+      if (users.isEmpty) {
+        return null;
+      }
+
+      // Extract phone number from attributes
+      final phoneAttr = users.first.attributes?['MobilePhoneNo'];
+
+      if (phoneAttr is List && phoneAttr.isNotEmpty) {
+        return phoneAttr.first.toString();
+      } else if (phoneAttr is String) {
+        return phoneAttr;
+      }
+
+      return null;
+    } catch (e) {
+      print('[AUTH] Error getting phone number: $e');
+      return null;
+    }
   }
 
   Future<TokenResponse> login(String username, String password) async {

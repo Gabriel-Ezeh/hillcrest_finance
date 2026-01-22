@@ -139,20 +139,53 @@ class _AuthApiClient implements AuthApiClient {
   }
 
   @override
+  Future<KeycloakUser> getUserInfo({
+    required String realm,
+    required String bearerToken,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'Authorization': bearerToken};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<KeycloakUser>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/auth/realms/${realm}/protocol/openid-connect/userinfo',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late KeycloakUser _value;
+    try {
+      _value = KeycloakUser.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<List<KeycloakUser>> getUsers({
     required String realm,
+    String? username,
     String? email,
-    String? q,
     int? first,
     int? max,
+    String? q,
     required String adminToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
+      r'username': username,
       r'email': email,
-      r'q': q,
       r'first': first,
       r'max': max,
+      r'q': q,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'Authorization': adminToken};
@@ -174,6 +207,38 @@ class _AuthApiClient implements AuthApiClient {
       _value = _result.data!
           .map((dynamic i) => KeycloakUser.fromJson(i as Map<String, dynamic>))
           .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<KeycloakUser> getUserById({
+    required String realm,
+    required String userId,
+    required String adminToken,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'Authorization': adminToken};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<KeycloakUser>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/auth/admin/realms/${realm}/users/${userId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late KeycloakUser _value;
+    try {
+      _value = KeycloakUser.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

@@ -11,7 +11,7 @@ part 'auth_api_client.g.dart';
 abstract class AuthApiClient {
   factory AuthApiClient(Dio dio, {String? baseUrl}) = _AuthApiClient;
 
-  // --- STANDARD AUTH ---
+  // --- STANDARD AUTH --- //
 
   @POST(ApiConstants.keycloakTokenEndpoint)
   @FormUrlEncoded()
@@ -43,17 +43,31 @@ abstract class AuthApiClient {
     @Field("refresh_token") required String refreshToken,
   });
 
-  // --- ADMIN API ---
+
+
+
+  // --- ADMIN API --- //
 
   @GET(ApiConstants.keycloakGetUsers)
   Future<List<KeycloakUser>> getUsers({
     @Path("realm") required String realm,
+    @Query("username") String? username,
     @Query("email") String? email,
-    @Query("q") String? q,
     @Query("first") int? first,
     @Query("max") int? max,
+    @Query("q") String? q,
     @Header("Authorization") required String adminToken,
   });
+
+  @GET(ApiConstants.keycloakUpdateUser)
+  Future<KeycloakUser> getUserById({
+    @Path("realm") required String realm,
+    @Path("userId") required String userId,
+    @Header("Authorization") required String adminToken,
+  });
+
+  // ADDED: Get a single user by their unique ID
+
 
   @POST(ApiConstants.keycloakCreateUser)
   Future<void> createUser({

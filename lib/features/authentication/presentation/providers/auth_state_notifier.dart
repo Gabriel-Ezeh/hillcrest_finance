@@ -8,13 +8,11 @@ import 'auth_state.dart';
 class AuthStateNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
-    return AuthState(
-      isAuthenticated: false,
-      accessToken: null,
-      isLoading: false,
-    );
+    // Use the factory constructor for a clean initial state.
+    return AuthState.initial();
   }
 
+  // checkInitialStatus remains unchanged as per the request.
   Future<void> checkInitialStatus() async {
     try {
       final storage = ref.read(userLocalStorageProvider);
@@ -55,20 +53,62 @@ class AuthStateNotifier extends Notifier<AuthState> {
     try {
       final authRepo = ref.read(authRepositoryProvider);
       final tokenResponse = await authRepo.login(username, password);
-      _onLoginSuccess(tokenResponse);
+
+      // On successful login, pass username to the handler
+      await _onLoginSuccess(tokenResponse, username);
+
     } on NetworkException {
-      rethrow;
-    } finally {
       setLoading(false);
+      rethrow;
+    } catch (e) {
+      setLoading(false);
+      rethrow;
     }
   }
 
-  void _onLoginSuccess(TokenResponse tokenResponse) {
+  // In auth_state_notifier.dart
+
+  Future<void> _onLoginSuccess(TokenResponse tokenResponse, String username) async {
+    final localStorage = ref.read(userLocalStorageProvider);
+
+    // Fetch both customerNo status AND accountType in one call
+    Map<String, dynamic> onboardingStatus;
+    try {
+      onboardingStatus = await ref.read(authRepositoryProvider).getUserOnboardingStatus(username);
+      // Update cache
+      await localStorage.setHasCustomerNo(onboardingStatus['hasCustomerNo'] as bool);
+      // You might want to cache accountType too if needed
+    } catch (e) {
+      print("[AUTH] Failed to check onboarding status: $e");
+      // Fallback to cached values
+      onboardingStatus = {
+        'hasCustomerNo': localStorage.hasCustomerNo ?? false,
+        'accountType': null,
+      };
+    }
+
+    // Update state with fresh data
     state = state.copyWith(
       isAuthenticated: true,
       isLoading: false,
       token: tokenResponse,
+      hasCustomerNo: onboardingStatus['hasCustomerNo'] as bool,
+      accountType: onboardingStatus['accountType'] as String?, // ADDED
     );
+  }
+
+  /// Optional: Keep for periodic background checks if needed
+  Future<void> _refreshCustomerNoStatus(bool cachedStatus, String username) async {
+    try {
+      final freshStatus = await ref.read(authRepositoryProvider).checkForCustomerNo(username);
+
+      if (cachedStatus != freshStatus) {
+        await ref.read(userLocalStorageProvider).setHasCustomerNo(freshStatus);
+        state = state.copyWith(hasCustomerNo: freshStatus);
+      }
+    } catch (e) {
+      print("[AUTH] Background customer number check failed: $e");
+    }
   }
 
   void setLoading(bool value) {
@@ -77,12 +117,12 @@ class AuthStateNotifier extends Notifier<AuthState> {
 
   Future<void> logout() async {
     try {
-      await (ref.read(authRepositoryProvider) as dynamic).logout();
+      await ref.read(authRepositoryProvider).logout();
     } catch (_) {
-      // Ignore errors, just clear local state
+      // Ignore errors on logout
     }
+    // Clear local data and reset state
+    await ref.read(userLocalStorageProvider).setHasCustomerNo(false);
     state = AuthState.initial();
   }
-
-
 }

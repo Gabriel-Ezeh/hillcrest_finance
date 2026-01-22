@@ -43,6 +43,38 @@ class EmailVerificationRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [IndividualKycDocumentUploadScreen]
+class IndividualKycDocumentUploadRoute extends PageRouteInfo<void> {
+  const IndividualKycDocumentUploadRoute({List<PageRouteInfo>? children})
+    : super(IndividualKycDocumentUploadRoute.name, initialChildren: children);
+
+  static const String name = 'IndividualKycDocumentUploadRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const IndividualKycDocumentUploadScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [IndividualPersonalInformationScreen]
+class IndividualPersonalInformationRoute extends PageRouteInfo<void> {
+  const IndividualPersonalInformationRoute({List<PageRouteInfo>? children})
+    : super(IndividualPersonalInformationRoute.name, initialChildren: children);
+
+  static const String name = 'IndividualPersonalInformationRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const IndividualPersonalInformationScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [MainWrapperScreen]
 class MainWrapperRoute extends PageRouteInfo<void> {
   const MainWrapperRoute({List<PageRouteInfo>? children})

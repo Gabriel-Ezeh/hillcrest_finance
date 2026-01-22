@@ -7,7 +7,9 @@ class UserLocalStorage {
 
   static const String _kHasSeenOnboarding = 'hasSeenOnboarding';
   static const String _kLastUsedUsername = 'lastUsedUsername';
+  static const String _kHasCustomerNo = 'hasCustomerNo'; // ADDED
 
+  // --- Onboarding Status ---
   bool get hasSeenOnboarding {
     return _box.get(_kHasSeenOnboarding, defaultValue: false) as bool;
   }
@@ -16,6 +18,7 @@ class UserLocalStorage {
     await _box.put(_kHasSeenOnboarding, true);
   }
 
+  // --- Last Used Username ---
   String? get lastUsedUsername {
     return _box.get(_kLastUsedUsername) as String?;
   }
@@ -24,17 +27,24 @@ class UserLocalStorage {
     await _box.put(_kLastUsedUsername, username);
   }
 
+  // --- Customer Number Status --- // ADDED SECTION
+  bool get hasCustomerNo {
+    return _box.get(_kHasCustomerNo, defaultValue: false) as bool;
+  }
+
+  Future<void> setHasCustomerNo(bool hasNo) async {
+    await _box.put(_kHasCustomerNo, hasNo);
+  }
+
+  // --- Deprecated/Old Methods ---
+
   Future<void> saveCredentials(String username, String email) async {
     await _box.put(_kLastUsedUsername, username);
-    // You might want to save the email as well, for example:
-    // await _box.put('lastUsedEmail', email);
   }
 
   Future<void> clearCredentials() async {
     await _box.delete(_kLastUsedUsername);
   }
-
-// lib/app/core/providers/user_local_storage_provider.dart
 
   Future<void> clearTokens() async {
     final box = await Hive.openBox('authData');
@@ -50,6 +60,4 @@ class UserLocalStorage {
     await _box.put('accessToken', accessToken);
     await _box.put('refreshToken', refreshToken);
   }
-
-
 }

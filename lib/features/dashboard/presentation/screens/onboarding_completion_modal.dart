@@ -151,18 +151,72 @@ class OnboardingCompletionModal extends StatelessWidget {
   }
 }
 
-// Helper function to show the modal
+// In onboarding_completion_modal.dart
+
 void showOnboardingCompletionModal(
     BuildContext context, {
+      required String accountType, // ADDED
       required VoidCallback onContinue,
-      VoidCallback? onClose,
     }) {
+  // Get steps based on account type
+  final steps = _getStepsForAccountType(accountType);
+
   showDialog(
     context: context,
-    barrierDismissible: true,
-    builder: (context) => OnboardingCompletionModal(
-      onContinue: onContinue,
-      onClose: onClose,
+    builder: (context) => AlertDialog(
+      title: Text('Complete Your ${accountType} KYC'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Please complete the following steps:'),
+          const SizedBox(height: 16),
+          ...steps.map((step) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Icon(Icons.check_circle_outline, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(step)),
+              ],
+            ),
+          )),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: onContinue,
+          child: const Text('Continue'),
+        ),
+      ],
     ),
   );
+}
+
+List<String> _getStepsForAccountType(String accountType) {
+  switch (accountType.toLowerCase()) {
+    case 'individual':
+      return [
+        'Personal Information',
+        'Identity Verification',
+        'Address Proof',
+        'Signature Upload',
+      ];
+    case 'corporate':
+      return [
+        'Company Information',
+        'Directors Information',
+        'Business Registration Documents',
+        'Tax Identification',
+      ];
+    case 'sme':
+      return [
+        'Business Information',
+        'Owner Details',
+        'Business Registration',
+        'Bank Verification',
+      ];
+    default:
+      return ['Complete KYC Process'];
+  }
 }
